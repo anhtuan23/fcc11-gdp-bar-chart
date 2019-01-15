@@ -1,4 +1,4 @@
-body{
+body {
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -8,12 +8,19 @@ body{
   align-items: center;
 }
 
-#wrapper{
+#wrapper {
   width: 1000px;
   height: 500px;
   background-color: white;
 }
 
-rect.bar{
-  background-color: aqua;
+rect.bar {
+  /* -moz-transition: all 0.25s;
+  -o-transition: all 0.25s;
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s; */
 }
+
+/* rect.bar:hover {
+  fill: aqua;
+} */
