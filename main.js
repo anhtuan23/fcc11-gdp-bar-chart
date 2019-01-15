@@ -2,12 +2,16 @@ d3.json("GDP-data.json").then(d => {
   const parseTime = d3.timeParse("%Y-%m-%d");
   let prevGdp = 0;
   let dataset = d.data.map(e => {
-    growth = (e[1] - prevGdp) / prevGdp;
+    growth = (e[1] - prevGdp) / prevGdp * 100;
     prevGdp = e[1]
     return {
       time: parseTime(e[0]),
       gdp: e[1],
-      growth
+      growth,
+      getBarColor() { return this.growth >= 0 ? "green" : "red"; },
+      getTimeStamp() { return `${this.time.getFullYear()} Q${Math.floor((this.time.getMonth() + 3) / 3)}` },
+      getGdp() { return `$${this.gdp.toLocaleString()} Billion` },
+      getGrowth() { return `${this.growth <= 0 ? "" : "+"}${this.growth.toFixed(2)}%` }
     }
   });
 
@@ -39,13 +43,32 @@ d3.json("GDP-data.json").then(d => {
     .enter()
     .append('rect')
     .classed('bar', true)
-    .attr('fill', d => getBarColor(d))
+    .attr('fill', d => d.getBarColor())
     .attr('width', barWidth)
     .attr('height', d => yScale(0) - yScale(d.gdp))
     .attr('x', (d, i) => xScale(d.time))
     .attr('y', d => contentHeight + margin.top - yScale(0) + yScale(d.gdp))
-    .on("mouseover", function () { d3.select(this).attr("fill", "aqua"); })
-    .on("mouseout", function (d) { d3.select(this).attr("fill", getBarColor(d)); });
+    .on("mouseover", function (d) {
+      d3.select(this).attr("fill", "aqua");
+
+      //Get this bar's x/y values, then augment for the tooltip
+      var xPosition = parseFloat(d3.select(this).attr("x")); //+ xScale.bandwidth() / 2;
+      var yPosition = parseFloat(d3.select(this).attr("y")); //+ yScale.bandwidth() / 2;
+      //Update the tooltip position and value
+      const tooltip = d3.select("#tooltip")
+        .style("left", xPosition + "px")
+        .style("top", yPosition + "px");
+      tooltip.select("#time").text(d.getTimeStamp());
+      tooltip.select("#gdp").text(d.getGdp());
+      tooltip.select("#growth").text(d.getGrowth());
+      //Show the tooltip
+      d3.select("#tooltip").classed("hidden", false);
+    })
+    .on("mouseout", function (d) {
+      d3.select(this).attr("fill", d.getBarColor());
+      //Hide the tooltip
+      d3.select("#tooltip").classed("hidden", true);
+    });
 
   const xAxis = d3.axisBottom(xScale);
 
@@ -61,7 +84,3 @@ d3.json("GDP-data.json").then(d => {
     .attr("transform", `translate(${margin.left}, ${margin.top})`)
     .call(yAxis);
 });
-
-function getBarColor(data) {
-  return data.growth >= 0 ? "green" : "red"
-}
