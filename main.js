@@ -87,4 +87,13 @@ d3.json("GDP-data.json").then(d => {
     .attr("id", "y-axis")
     .attr("transform", `translate(${margin.left}, ${margin.top})`)
     .call(yAxis);
+
+  // text label for the y axis
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 30)
+    .attr("x", - svgHeight / 3)
+    .attr("dy", "1.8em")
+    .style("text-anchor", "middle")
+    .text("Gross Domestic Product");
 });
