@@ -1,5 +1,6 @@
 d3.json("GDP-data.json").then(d => {
   const parseTime = d3.timeParse("%Y-%m-%d");
+  const formatTime = d3.timeFormat("%Y-%m-%d");
   let prevGdp = 0;
   let dataset = d.data.map(e => {
     growth = (e[1] - prevGdp) / prevGdp * 100;
@@ -46,6 +47,8 @@ d3.json("GDP-data.json").then(d => {
     .attr('height', d => yScale(0) - yScale(d.gdp))
     .attr('x', (d, i) => xScale(d.time))
     .attr('y', d => contentHeight + margin.top - yScale(0) + yScale(d.gdp))
+    .attr('data-date', d => formatTime(d.time))
+    .attr('data-gdp', d => d.gdp)
     .on("mouseover", function (d) {
       d3.select(this).attr("fill", "aqua");
 
@@ -54,6 +57,7 @@ d3.json("GDP-data.json").then(d => {
       var yPosition = parseFloat(d3.select(this).attr("y")); //+ yScale.bandwidth() / 2;
       //Update the tooltip position and value
       const tooltip = d3.select("#tooltip")
+        .attr('data-date', formatTime(d.time))
         .style("left", xPosition + "px")
         .style("top", yPosition + "px");
       tooltip.select("#time").text(d.getTimeStamp());
@@ -72,6 +76,7 @@ d3.json("GDP-data.json").then(d => {
 
   svg.append("g")
     .attr("class", "axis")
+    .attr("id", "x-axis")
     .attr("transform", `translate(0, ${margin.top + contentHeight})`)
     .call(xAxis);
 
@@ -79,6 +84,7 @@ d3.json("GDP-data.json").then(d => {
 
   svg.append("g")
     .attr("class", "axis")
+    .attr("id", "y-axis")
     .attr("transform", `translate(${margin.left}, ${margin.top})`)
     .call(yAxis);
 });
