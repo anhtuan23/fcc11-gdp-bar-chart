@@ -32,11 +32,9 @@ d3.json("GDP-data.json").then(d => {
   const yScale = d3.scaleLinear().domain([0, maxGdp]).range([contentHeight, 0]);//yScale is inverted for yAxis
 
 
-  const svg = d3.select('#wrapper')
-    .append('svg')
+  const svg = d3.select('svg')
     .attr('width', svgWidth)
-    .attr('height', svgHeight)
-    .style('background-color', '#DDD');
+    .attr('height', svgHeight);
 
   svg.selectAll('rect')
     .data(dataset)
